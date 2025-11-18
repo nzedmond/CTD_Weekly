@@ -16,7 +16,7 @@ export default defineConfig([
     ],
     languageOptions: {
       ecmaVersion: 2020,
-      setting: {react: {version: 'detect'}},
+      settings: {react: {version: 'detect'}},
       globals: globals.browser,
       parserOptions: {
         ecmaVersion: 'latest',
@@ -26,7 +26,7 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'no-used-vars': 'warn', // this changes the error to a warning
+      'no-unused-vars': 'warn', // this changes the error to a warning
       'react/prop-types': 'off', //this suppresses warnings about not using prop-types.
     },
   },
