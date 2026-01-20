@@ -1,7 +1,7 @@
 import './App.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
-import { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -27,7 +27,18 @@ function App() {
         }
 
         const data = await resp.json();
-        setTodoList(data.records);
+      
+        const mappedTodos = data.records.map(record => {
+          const todo = {
+            id: record.id,
+            title: record.fields.title,
+          };
+          if(!todo.fields.isCompleted){
+            todo.isCompleted = false;
+          };
+          return todo;
+        });
+        setTodoList(mappedTodos);
       } catch (error) {
         setErrorMessage(error.message);
       } finally {
@@ -74,7 +85,7 @@ function App() {
     <div>
       <h1>Todo List</h1>
       <TodoForm onAddTodo={addTodo} />
-      <TodoList todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} />
+      <TodoList isLoading={isLoading} todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} />
     </div>
   );
 }
