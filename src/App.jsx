@@ -5,7 +5,37 @@ import { useState } from 'react';
 
 function App() {
   const [todoList, setTodoList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
+  const token = `Bearer ${import.meta.env.VITE_PAT}`;
 
+  useEffect(() => {
+    const fetchTodos = async () => {
+      setIsLoading(true);
+      try {
+        const options = {
+          method: "GET",
+          headers: {
+            "Authorization": token
+          }
+        };
+
+        const resp = await fetch(url, options);
+        if (!resp.ok) {
+          throw new Error(resp.message);
+        }
+
+        const data = await resp.json();
+        setTodoList(data.records);
+      } catch (error) {
+        setErrorMessage(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTodos();
+  }, [])
 
   function addTodo(title) {
     const newTodo = {
