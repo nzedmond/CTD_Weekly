@@ -27,18 +27,24 @@ function App() {
         }
 
         const data = await resp.json();
-      
+        // console.log(data); // debugging line
         const mappedTodos = data.records.map(record => {
+          
           const todo = {
             id: record.id,
-            title: record.fields.title,
+            // title: record.fields.title,
+            ...record.fields,
           };
-          if(!todo.fields.isCompleted){
+          // console.log(todo); // debugging line
+          if(todo.isCompleted === undefined){
             todo.isCompleted = false;
           };
+          // console.log(todo); // debugging line
           return todo;
         });
+        console.log(mappedTodos); // debugging line
         setTodoList(mappedTodos);
+        
       } catch (error) {
         setErrorMessage(error.message);
       } finally {
@@ -86,6 +92,13 @@ function App() {
       <h1>Todo List</h1>
       <TodoForm onAddTodo={addTodo} />
       <TodoList isLoading={isLoading} todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} />
+      {errorMessage && (
+        <div>
+          <hr />
+          <p>{errorMessage}</p>
+          <button onClick={() => setErrorMessage("")}>Dismiss</button>
+        </div>
+      )}
     </div>
   );
 }
