@@ -5,6 +5,8 @@ export default function TodosViewForm({
   setSortDirection,
   sortField,
   setSortField,
+  queryString,
+  setQueryString,
 }) {
   const preventRefresh = (e) => {
     e.preventDefault();
@@ -12,6 +14,19 @@ export default function TodosViewForm({
 
   return (
     <form onSubmit={preventRefresh}>
+      <div>
+        <label htmlFor="search-todos">Search todos:</label>
+        <input
+          id="search-todos"
+          type="text"
+          value={queryString}
+          onChange={(e) => setQueryString(e.target.value)}
+        />
+        <button type="button" onClick={() => setQueryString('')}>
+          Clear
+        </button>
+      </div>
+
       <div>
         <label htmlFor="sort-field">Sort by</label>
         <select
