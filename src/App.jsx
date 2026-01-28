@@ -1,6 +1,7 @@
 import './App.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
+import TodosViewForm from './features/TodosViewForm';
 import React, { useEffect, useState } from 'react';
 
 /* =======================
@@ -48,6 +49,11 @@ const optimisticUpdate = async ({
   }
 };
 
+const encodeUrl = ({ sortField, sortDirection }) => {
+  let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+  return encodeURI(`${BASE_URL}?${sortQuery}`);
+};
+
 /* =======================
    Component
 ======================= */
@@ -57,6 +63,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [sortField, setSortField] = useState('createdTime');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   /* ---------- Fetch ---------- */
 
@@ -64,7 +72,7 @@ function App() {
     const fetchTodos = async () => {
       setIsLoading(true);
       try {
-        const data = await fetchAirtable(BASE_URL, {
+        const data = await fetchAirtable(encodeUrl({ sortField, sortDirection }), {
           method: 'GET',
           headers: AIRTABLE_HEADERS,
         });
@@ -78,7 +86,7 @@ function App() {
     };
 
     fetchTodos();
-  }, []);
+  }, [sortField, sortDirection]);
 
   /* ---------- Create ---------- */
 
@@ -184,6 +192,13 @@ function App() {
         todoList={todoList}
         onCompleteTodo={completeTodo}
         onUpdateTodo={updateTodo}
+      />
+      <hr />
+      <TodosViewForm
+        sortField={sortField}
+        setSortField={setSortField}
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
       />
       {errorMessage && (
         <div>
