@@ -1,53 +1,199 @@
 import './App.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+/* =======================
+   Constants
+======================= */
+
+const BASE_URL = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
+const AIRTABLE_HEADERS = {
+  Authorization: `Bearer ${import.meta.env.VITE_PAT}`,
+  'Content-Type': 'application/json',
+};
+
+/* =======================
+   Helpers
+======================= */
+
+const normalizeTodo = (record) => ({
+  id: record.id,
+  ...record.fields,
+  isCompleted: record.fields.isCompleted ?? false,
+});
+
+const fetchAirtable = async (url, options) => {
+  const resp = await fetch(url, options);
+  if (!resp.ok) {
+    throw new Error(`HTTP ${resp.status}`);
+  }
+  return resp.json();
+};
+
+const optimisticUpdate = async ({
+  snapshot,
+  setState,
+  optimisticState,
+  apiCall,
+  rollbackMessage,
+  setErrorMessage,
+}) => {
+  setState(optimisticState);
+  try {
+    await apiCall();
+  } catch (error) {
+    setErrorMessage(`${error.message}. ${rollbackMessage}`);
+    setState(snapshot);
+  }
+};
+
+/* =======================
+   Component
+======================= */
 
 function App() {
   const [todoList, setTodoList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
+  /* ---------- Fetch ---------- */
 
-  function addTodo(title) {
-    const newTodo = {
-      title: title,
-      id: Date.now(),
-      isCompleted: false
+  useEffect(() => {
+    const fetchTodos = async () => {
+      setIsLoading(true);
+      try {
+        const data = await fetchAirtable(BASE_URL, {
+          method: 'GET',
+          headers: AIRTABLE_HEADERS,
+        });
+
+        setTodoList(data.records.map(normalizeTodo));
+      } catch (error) {
+        setErrorMessage(error.message);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    setTodoList(prevTodoList => [...prevTodoList, newTodo]);
-  }
 
-  function completeTodo(id) {
-    const updatedTodos = todoList.map(todo => {
-      if (todo.id === id) {
-        return {
-          ...todo,
-          isCompleted: true
-        };
-      }
-      return todo;
+    fetchTodos();
+  }, []);
+
+  /* ---------- Create ---------- */
+
+  const addTodo = async (newTodo) => {
+    const payload = {
+      records: [
+        {
+          fields: {
+            title: newTodo.title,
+            isCompleted: newTodo.isCompleted,
+          },
+        },
+      ],
+    };
+
+    try {
+      setIsSaving(true);
+      const data = await fetchAirtable(BASE_URL, {
+        method: 'POST',
+        headers: AIRTABLE_HEADERS,
+        body: JSON.stringify(payload),
+      });
+
+      const savedTodo = normalizeTodo(data.records[0]);
+      setTodoList((prev) => [...prev, savedTodo]);
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /* ---------- Complete ---------- */
+
+  const completeTodo = async (id) => {
+    const snapshot = [...todoList];
+    const optimisticState = todoList.map((todo) =>
+      todo.id === id ? { ...todo, isCompleted: true } : todo
+    );
+
+    setIsSaving(true);
+    await optimisticUpdate({
+      snapshot,
+      setState: setTodoList,
+      optimisticState,
+      apiCall: () =>
+        fetchAirtable(BASE_URL, {
+          method: 'PATCH',
+          headers: AIRTABLE_HEADERS,
+          body: JSON.stringify({
+            records: [{ id, fields: { isCompleted: true } }],
+          }),
+        }),
+      rollbackMessage: 'Reverting todo...',
+      setErrorMessage,
     });
+    setIsSaving(false);
+  };
 
-    setTodoList(updatedTodos);
-  }
+  /* ---------- Update ---------- */
 
-  function updateTodo(editedTodo) {
-    const updatedTodos = todoList.map(todo => {
-      if (todo.id === editedTodo.id) {
-        return { ...editedTodo };
-      }
-      return todo;
+  const updateTodo = async (editedTodo) => {
+    const snapshot = [...todoList];
+    const optimisticState = todoList.map((todo) =>
+      todo.id === editedTodo.id ? editedTodo : todo
+    );
+
+    setIsSaving(true);
+    await optimisticUpdate({
+      snapshot,
+      setState: setTodoList,
+      optimisticState,
+      apiCall: () =>
+        fetchAirtable(BASE_URL, {
+          method: 'PATCH',
+          headers: AIRTABLE_HEADERS,
+          body: JSON.stringify({
+            records: [
+              {
+                id: editedTodo.id,
+                fields: {
+                  title: editedTodo.title,
+                  isCompleted: editedTodo.isCompleted,
+                },
+              },
+            ],
+          }),
+        }),
+      rollbackMessage: 'Reverting todo...',
+      setErrorMessage,
     });
-    setTodoList(updatedTodos);
-  }
+    setIsSaving(false);
+  };
+
+  /* ---------- Render ---------- */
 
   return (
     <div>
       <h1>Todo List</h1>
-      <TodoForm onAddTodo={addTodo} />
-      <TodoList todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo} />
+      <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
+      <TodoList
+        isLoading={isLoading}
+        todoList={todoList}
+        onCompleteTodo={completeTodo}
+        onUpdateTodo={updateTodo}
+      />
+      {errorMessage && (
+        <div>
+          <hr />
+          <p>{errorMessage}</p>
+          <button onClick={() => setErrorMessage('')}>Dismiss</button>
+        </div>
+      )}
     </div>
   );
 }
 
 export default App;
-
