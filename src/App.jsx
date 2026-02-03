@@ -1,6 +1,7 @@
 import './App.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
+import TodosViewForm from './features/TodosViewForm';
 import React, { useEffect, useState } from 'react';
 
 /* =======================
@@ -48,6 +49,15 @@ const optimisticUpdate = async ({
   }
 };
 
+const encodeUrl = ({ sortField, sortDirection, queryString }) => {
+  let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+  let searchQuery = '';
+  if (queryString) {
+    searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+  }
+  return encodeURI(`${BASE_URL}?${sortQuery}${searchQuery}`);
+};
+
 /* =======================
    Component
 ======================= */
@@ -57,6 +67,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [sortField, setSortField] = useState('createdTime');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [queryString, setQueryString] = useState('');
 
   /* ---------- Fetch ---------- */
 
@@ -64,7 +77,7 @@ function App() {
     const fetchTodos = async () => {
       setIsLoading(true);
       try {
-        const data = await fetchAirtable(BASE_URL, {
+        const data = await fetchAirtable(encodeUrl({ sortField, sortDirection, queryString }), {
           method: 'GET',
           headers: AIRTABLE_HEADERS,
         });
@@ -78,7 +91,7 @@ function App() {
     };
 
     fetchTodos();
-  }, []);
+  }, [sortField, sortDirection, queryString]);
 
   /* ---------- Create ---------- */
 
@@ -184,6 +197,15 @@ function App() {
         todoList={todoList}
         onCompleteTodo={completeTodo}
         onUpdateTodo={updateTodo}
+      />
+      <hr />
+      <TodosViewForm
+        sortField={sortField}
+        setSortField={setSortField}
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
+        queryString={queryString}
+        setQueryString={setQueryString}
       />
       {errorMessage && (
         <div>
