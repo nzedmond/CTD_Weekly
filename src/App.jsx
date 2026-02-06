@@ -2,7 +2,7 @@ import './App.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
 import TodosViewForm from './features/TodosViewForm';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 /* =======================
    Constants
@@ -49,15 +49,6 @@ const optimisticUpdate = async ({
   }
 };
 
-const encodeUrl = ({ sortField, sortDirection, queryString }) => {
-  let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-  let searchQuery = '';
-  if (queryString) {
-    searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
-  }
-  return encodeURI(`${BASE_URL}?${sortQuery}${searchQuery}`);
-};
-
 /* =======================
    Component
 ======================= */
@@ -71,13 +62,22 @@ function App() {
   const [sortDirection, setSortDirection] = useState('desc');
   const [queryString, setQueryString] = useState('');
 
+  const encodeUrl = useCallback(() => {
+    let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+    let searchQuery = '';
+    if (queryString) {
+      searchQuery = `&filterByFormula=SEARCH("${queryString}",+title)`;
+    }
+    return encodeURI(`${BASE_URL}?${sortQuery}${searchQuery}`);
+  }, [sortField, sortDirection, queryString]);
+
   /* ---------- Fetch ---------- */
 
   useEffect(() => {
     const fetchTodos = async () => {
       setIsLoading(true);
       try {
-        const data = await fetchAirtable(encodeUrl({ sortField, sortDirection, queryString }), {
+        const data = await fetchAirtable(encodeUrl(), {
           method: 'GET',
           headers: AIRTABLE_HEADERS,
         });
@@ -91,7 +91,7 @@ function App() {
     };
 
     fetchTodos();
-  }, [sortField, sortDirection, queryString]);
+  }, [encodeUrl]);
 
   /* ---------- Create ---------- */
 
