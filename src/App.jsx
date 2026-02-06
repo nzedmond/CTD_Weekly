@@ -1,4 +1,4 @@
-import './App.css';
+import styles from './App.module.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
 import TodosViewForm from './features/TodosViewForm';
@@ -189,7 +189,7 @@ function App() {
   /* ---------- Render ---------- */
 
   return (
-    <div>
+    <div className={styles.container}>
       <h1>Todo List</h1>
       <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
       <TodoList
@@ -208,10 +208,9 @@ function App() {
         setQueryString={setQueryString}
       />
       {errorMessage && (
-        <div>
-          <hr />
-          <p>{errorMessage}</p>
-          <button onClick={() => setErrorMessage('')}>Dismiss</button>
+        <div className={styles.errorContainer}>
+          <p className={styles.errorMessage}>{errorMessage}</p>
+          <button className={styles.dismissBtn} onClick={() => setErrorMessage('')}>Dismiss</button>
         </div>
       )}
     </div>
