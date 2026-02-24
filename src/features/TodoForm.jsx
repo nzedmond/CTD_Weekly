@@ -25,7 +25,7 @@ function TodoForm({ onAddTodo, isSaving }) {
         elementId="id"
         labelText="Todo"
       />
-      <button className="add-btn" disabled={!workingTodoTitle.trim()}>{isSaving ? "Saving..." : "Add Todo"}</button>
+      <button disabled={!workingTodoTitle.trim()}>{isSaving ? "Saving..." : "Add Todo"}</button>
     </form>
   );
 }

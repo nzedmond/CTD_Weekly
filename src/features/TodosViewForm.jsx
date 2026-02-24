@@ -23,25 +23,24 @@ export default function TodosViewForm({
   };
 
   return (
-    <form className="view-form" onSubmit={preventRefresh}>
-      <div className="input-group">
+    <form onSubmit={preventRefresh}>
+      <div>
         <label htmlFor="search-todos">Search todos:</label>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div>
           <input
             id="search-todos"
             type="text"
-            style={{ flexGrow: 1 }}
             value={localQueryString}
             onChange={(e) => setLocalQueryString(e.target.value)}
           />
-          <button type="button" className="dismiss-btn" onClick={() => setLocalQueryString('')}>
+          <button type="button" onClick={() => setLocalQueryString('')}>
             Clear
           </button>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <div className="input-group" style={{ flex: '1 1 200px' }}>
+      <div>
+        <div>
           <label htmlFor="sort-field">Sort by</label>
           <select
             id="sort-field"
@@ -53,7 +52,7 @@ export default function TodosViewForm({
           </select>
         </div>
 
-        <div className="input-group" style={{ flex: '1 1 150px' }}>
+        <div>
           <label htmlFor="sort-direction">Direction</label>
           <select
             id="sort-direction"

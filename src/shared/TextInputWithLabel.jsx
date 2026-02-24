@@ -6,7 +6,7 @@ function TextInputWithLabel({
   value,
 }) {
   return (
-    <div className="input-group">
+    <div>
       <label htmlFor={elementId}>{labelText}</label>
       <input
         type="text"
