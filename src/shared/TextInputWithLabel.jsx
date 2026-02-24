@@ -1,3 +1,12 @@
+import styled from 'styled-components';
+
+const StyledInputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0; /* Adding spacing as requested in Part 3 */
+`;
+
 function TextInputWithLabel({
   elementId,
   labelText,
@@ -6,7 +15,7 @@ function TextInputWithLabel({
   value,
 }) {
   return (
-    <div>
+    <StyledInputGroup>
       <label htmlFor={elementId}>{labelText}</label>
       <input
         type="text"
@@ -15,7 +24,7 @@ function TextInputWithLabel({
         value={value}
         onChange={onChange}
       />
-    </div>
+    </StyledInputGroup>
   );
 }
 

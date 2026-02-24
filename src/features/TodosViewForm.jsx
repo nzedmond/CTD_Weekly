@@ -1,5 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import styles from './TodosViewForm.module.css';
+import styled from 'styled-components';
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0; /* Spacing for the form */
+`;
+
+const StyledFieldGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0; /* Spacing for the items */
+`;
+
+const StyledRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+
+const StyledFlexGrow = styled.input`
+  flex-grow: 1;
+`;
+
+const StyledFlexItem = styled.div`
+  flex: 1 1 200px;
+`;
 
 export default function TodosViewForm({
   sortDirection,
@@ -24,25 +52,25 @@ export default function TodosViewForm({
   };
 
   return (
-    <form className={styles.viewForm} onSubmit={preventRefresh}>
-      <div className={styles.fieldGroup}>
+    <StyledForm onSubmit={preventRefresh}>
+      <StyledFieldGroup>
         <label htmlFor="search-todos">Search todos:</label>
-        <div className={styles.row}>
-          <input
+        <StyledRow>
+          <StyledFlexGrow
+            as="input"
             id="search-todos"
             type="text"
-            className={styles.flexGrow}
             value={localQueryString}
             onChange={(e) => setLocalQueryString(e.target.value)}
           />
           <button type="button" onClick={() => setLocalQueryString('')}>
             Clear
           </button>
-        </div>
-      </div>
+        </StyledRow>
+      </StyledFieldGroup>
 
-      <div className={styles.row}>
-        <div className={styles.flexItem}>
+      <StyledRow>
+        <StyledFlexItem>
           <label htmlFor="sort-field">Sort by</label>
           <select
             id="sort-field"
@@ -52,9 +80,9 @@ export default function TodosViewForm({
             <option value="title">Title</option>
             <option value="createdTime">Time added</option>
           </select>
-        </div>
+        </StyledFlexItem>
 
-        <div className={styles.flexItem}>
+        <StyledFlexItem>
           <label htmlFor="sort-direction">Direction</label>
           <select
             id="sort-direction"
@@ -64,8 +92,8 @@ export default function TodosViewForm({
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
-        </div>
-      </div>
-    </form>
+        </StyledFlexItem>
+      </StyledRow>
+    </StyledForm>
   );
 }

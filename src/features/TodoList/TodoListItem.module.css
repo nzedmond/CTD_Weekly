@@ -1,1 +1,17 @@
-/* Cleared for new approach */
+.listItem {
+  padding-bottom: 1rem;
+  /* Small amount of padding at bottom as requested */
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.todoTitle {
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.todoItemForm {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
