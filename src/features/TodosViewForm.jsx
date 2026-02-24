@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styles from './TodosViewForm.module.css';
 
 export default function TodosViewForm({
   sortDirection,
@@ -23,13 +24,14 @@ export default function TodosViewForm({
   };
 
   return (
-    <form onSubmit={preventRefresh}>
-      <div>
+    <form className={styles.viewForm} onSubmit={preventRefresh}>
+      <div className={styles.fieldGroup}>
         <label htmlFor="search-todos">Search todos:</label>
-        <div>
+        <div className={styles.row}>
           <input
             id="search-todos"
             type="text"
+            className={styles.flexGrow}
             value={localQueryString}
             onChange={(e) => setLocalQueryString(e.target.value)}
           />
@@ -39,8 +41,8 @@ export default function TodosViewForm({
         </div>
       </div>
 
-      <div>
-        <div>
+      <div className={styles.row}>
+        <div className={styles.flexItem}>
           <label htmlFor="sort-field">Sort by</label>
           <select
             id="sort-field"
@@ -52,7 +54,7 @@ export default function TodosViewForm({
           </select>
         </div>
 
-        <div>
+        <div className={styles.flexItem}>
           <label htmlFor="sort-direction">Direction</label>
           <select
             id="sort-direction"
