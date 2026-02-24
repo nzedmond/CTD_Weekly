@@ -25,7 +25,11 @@
 
 body {
   font-family: var(--font-family-sans);
-  background-color: var(--bg-body);
+  background: linear-gradient(rgba(10, 12, 16, 0.85), rgba(10, 12, 16, 0.85)),
+    url('./assets/bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
   padding: 3rem 1.5rem;

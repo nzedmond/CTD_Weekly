@@ -190,7 +190,12 @@ function App() {
 
   return (
     <div className={styles.container}>
-      <h1>Todo List</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--accent)' }}>
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+        <h1 style={{ margin: 0 }}>Todo List</h1>
+      </div>
       <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
       <TodoList
         isLoading={isLoading}
@@ -209,7 +214,14 @@ function App() {
       />
       {errorMessage && (
         <div className={styles.errorContainer}>
-          <p className={styles.errorMessage}>{errorMessage}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#f85149' }}>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <p className={styles.errorMessage}>{errorMessage}</p>
+          </div>
           <button className={styles.dismissBtn} onClick={() => setErrorMessage('')}>Dismiss</button>
         </div>
       )}
